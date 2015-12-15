@@ -1,0 +1,15 @@
+orange	132	123
+citron	6	7
+orange	154	156
+orange	167	107
+citron	5	3
+citron	7	5
+orange	112	100
+orange	156	157
+citron	6	10
+orange	122	156
+citron	13	9
+orange	500	69
+orange	6	8
+orange	154	177
+citron	1	16
