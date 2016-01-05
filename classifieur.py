@@ -1,23 +1,27 @@
-#!/usr/bin/ env python
+#! python3
 # -*- coding: utf-8 -*-
+string="!/usr/bin/ env python"
 nom = "Murphy Eoin"
-import Math
+import math
 class Instance(object):
-
-    def __init__(self, cat, coords) :
-        """Constructeur de la classe.
-        @param cat: a string
-        @param coords: a tuple of floats
-        """
-        self.cat = cat
-        self.coords = coords
+	def __init__(self, cat, coords) :
+		"""Constructeur de la classe.
+		@param cat: a string
+		@param coords: a tuple of floats
+		"""
+		self.cat = cat
+		self.coords = coords
 	def __str__(self):
 		return self.cat
+	def setCat(self,cat):
+		self.cat=cat
+	def getCoords(self):
+		return self.coords
 	def distance(self, other):
 		somme=0
 		for (x,y) in zip(self.coords,other.coords):
 			somme+=(x-y)**2
-		return Math.sqrt(somme)
+		return math.sqrt(somme)
 	def knn(self, k, listeInstances):
 		liste=[]
 		distances=[]
@@ -25,7 +29,7 @@ class Instance(object):
 		maxDistance=0
 		maxIndice=0
 		for element in listeInstances:
-			distanceEntre=distance(self, element)
+			distanceEntre=self.distance(element)
 			"""
 			For first k elements just place them in the list
 			For remaining elements: decide if they are closer than
@@ -33,8 +37,8 @@ class Instance(object):
 			recalculate the furthest neighbour
 			"""
 			if indice<k:
-				liste[indice]=element
-				distances[indice]=distanceEntre
+				liste.append(element)
+				distances.append(distanceEntre)
 				if distanceEntre>maxDistance:
 					maxDistance=distanceEntre
 					maxIndice=indice
@@ -46,16 +50,20 @@ class Instance(object):
 					maxDistance=0
 					maxIndice=0
 					for i in range(0,k):
-						if distance[i]>maxDistance:
+						if distances[i]>maxDistance:
 							maxIndice=i
 							maxDistance=distances[i]
 		return liste		
-				
+		
 def main():
-    """Appelez vos fonctions depuis main()"""
+	allInstances=read_instances("orangeTest.txt")
+	print(str(allInstances[0]))
+	predict(allInstances[:9],allInstances[10:])
+	classif=eval_classif(allInstances[:9],allInstances[10:])
+	print(str(classif)+"% classified correctly")
 def most_common(listInstances):
 	catsEtFreqs={}
-	for element in listInstance:
+	for element in listInstances:
 		if element.cat in catsEtFreqs:
 			catsEtFreqs[element.cat]+=1
 		else: 
@@ -74,16 +82,40 @@ def classify_instance(k,instance,all_instances):
 
 def read_instances(filename):
 	liste=[]
-	try:
-		stream=open(filename)
+	with open(filename) as stream:
+		for line in stream:
+			elements=line.split()
+			#for element in elements:
+			#	#print(element)
+			cat=elements[0]
+			coords=[]
+			for c in elements[1:]:
+				coords.append(float(c))
+			nextInstance=Instance(cat,coords)
+			liste.append(nextInstance)		
+	return liste		
+	
+def predict(listInstancesConnues,listInstancesInconnues):
+    for instance in listInstancesInconnues:
+        instance.setCat(classify_instance(10,instance,listInstancesConnues))
+        listInstancesConnues.append(instance)
+			
+def eval_classif(ref_instances,pred_instances):
+	correct=0
+	incorrect=0
+	for r in ref_instances:
+		for p in pred_instances:
+			if(r.getCoords()==p.getCoords()):
+				if(str(r)==str(p)):
+					correct+=1
+				else:
+					incorrect+=1
+	total=correct+incorrect
+	return (correct/total)*100	
 		
-		stream.close()
-	except:
-		print("Erreur de lecture")
-
 		
 """Cette condition s'assure de n'appeler la fonction main
 que lorsque le programme est appelé directement,
 et non lorsqu'il est importé."""
 if __name__ == "__main__":
-    main()
+	main()
